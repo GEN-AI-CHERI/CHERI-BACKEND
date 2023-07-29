@@ -1,7 +1,7 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Date, DateTime, String, BigInteger
 from sqlalchemy.orm import relationship
 
-from .database import Base
+from database import Base
 
 
 class Member(Base):
@@ -61,7 +61,7 @@ class Theme(Base):
 
 class RoomTheme(Base):
     __tablename__ = "room_theme"
-    theme_id = Column(BigInteger, primary_key=True, index=True)
+    room_theme_id = Column(BigInteger, primary_key=True, index=True)
     room_id = Column(BigInteger, ForeignKey("room.room_id"))
     theme_id = Column(BigInteger, ForeignKey("theme.theme_id"))
     room = relationship("Room", back_populates="room")
