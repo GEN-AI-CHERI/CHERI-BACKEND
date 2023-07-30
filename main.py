@@ -5,9 +5,10 @@ from sqlalchemy.orm import Session
 import scheme
 import crud
 import database
+import bcrypt
+from util import jwt_util
 
 app = FastAPI()
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,15 +26,34 @@ def get_db():
     finally:
         db.close()
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
 
 
-@app.post("/signup")
-async def member_sign_up(req: scheme.SignUpInfo, db: Session = Depends(get_db)):
+@app.post("/members/signup")
+async def member_sign_up(req: scheme.MemberSignInfo, db: Session = Depends(get_db)):
     member = crud.create_member(member=req, db=db)
     return {
-        "message": "Sign Up Request Successed.",
+        "message": "Sign Up Request Successes.",
         "email": str(member.email)
+    }
+
+
+@app.post("/members/signin")
+async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_db)):
+    member = crud.find_member_by_email(member=req, db=db)
+    if not bcrypt.checkpw(
+            req.password.encode('utf-8'),
+            member.password.encode('utf-8')):
+        return {
+                "message": "Log In Failed. Your email or password is invalid"
+        }
+    access_token, refresh_token = jwt_util.create_jwt(member.member_id)
+    
+    return {
+        "message": "Sign In Request Successes",
+        "access_token": access_token,
+        "refresh_token": refresh_token
     }
