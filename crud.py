@@ -23,8 +23,6 @@ def find_member_by_email(db: Session, member: scheme.MemberSignInfo):
     if db_member:
         for m in db_member:
             return m
-    else:
-        return None
 
 
 def find_region_list(db: Session):
