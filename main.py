@@ -2,12 +2,14 @@ from fastapi import FastAPI, Depends, Body, status, Header
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+import json
 
 import scheme
 import crud
 import database
 import bcrypt
 from util import jwt_util
+from util import gpt_util
 
 app = FastAPI()
 
@@ -47,10 +49,15 @@ async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_d
     member = crud.find_member_by_email(member=req, db=db)
     if not bcrypt.checkpw(req.password.encode('utf-8'), member.password.encode('utf-8')):
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message":"Your email or password is not valid."})
-
     access_token, refresh_token = jwt_util.create_jwt(member.member_id)
     return {
         "message": "Sign In Request Successes",
         "access_token": access_token,
         "refresh_token": refresh_token
     }
+
+@app.post("/chat")
+async def tour_chat():
+    return json.loads(
+        gpt_util.get_completion(prompt="Recommand tour plan in Seoul, Korea, for 3 days. Give Response only with json")
+    )
