@@ -4,7 +4,6 @@ from sqlalchemy.orm import relationship
 from database import Base
 
 
-
 class Member(Base):
     __tablename__ = "member"
 
@@ -40,6 +39,7 @@ class Room(Base):
     begin_date = Column(Date)
     end_date = Column(Date)
     region_id = Column(BigInteger, ForeignKey("region.region_id"))
+    region = relationship("Region", backref="region")
 
 
 class Chat(Base):
@@ -47,8 +47,10 @@ class Chat(Base):
     chat_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
     contents = Column(String)
     isQuestion = Column(Boolean)
-    createdAt = Column(DateTime, default="current")
+    createdAt = Column(DateTime)
     room_id = Column(BigInteger, ForeignKey("room.room_id"))
+    room = relationship("Room", backref="room")
+
 
 class Theme(Base):
     __tablename__ = "theme"

@@ -66,6 +66,40 @@ async def get_regions(db: Session = Depends(get_db)):
     }
 
 
+@app.post("/chatroom")
+async def start_chat(req: scheme.ChatRoomInfo, db: Session = Depends(get_db)):
+    chatroom = crud.create_chatroom(db=db, req=req)
+    print(chatroom.region_id)
+    region = crud.find_region(db=db, id=chatroom.region_id)
+    first_question = json.loads(
+        gpt_util.get_completion(
+            prompt="Recommand tour plan in " + region.title + ". I am " + chatroom.age + "years old. "
+                   + "I want to travel from " + str(chatroom.begin_date) + "to " + str(chatroom.end_date) + ". Give "
+                                                                                                            "Response "
+                                                                                                            "only "
+                                                                                                            "with json."
+                   + "Format is {"
+                     "'plan':,"
+                     "'description':,"
+                     "itinerary: ["
+                     "{'day':, 'description':, 'places':[],}"
+                     "], recommend_next_questions:[]}. recommend_next_questions is your recommend for next question."
+                     " the longer 'description' is the better.")
+    )
+    chat = crud.create_chat(
+        db=db,
+        contents=first_question,
+        isQuestion=False,
+        room_id=chatroom.room_id
+    )
+    return JSONResponse(status_code=status.HTTP_201_CREATED,
+                        content={
+                            "chatroom_id": chatroom.region_id,
+                            "chat_id": chat.chat_id,
+                            "message": first_question
+                        })
+
+
 @app.post("/chat")
 async def tour_chat():
     return json.loads(
