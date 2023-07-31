@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Body, status, Header
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -44,14 +45,10 @@ async def member_sign_up(req: scheme.MemberSignInfo, db: Session = Depends(get_d
 @app.post("/members/signin")
 async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_db)):
     member = crud.find_member_by_email(member=req, db=db)
-    if not bcrypt.checkpw(
-            req.password.encode('utf-8'),
-            member.password.encode('utf-8')):
-        return {
-                "message": "Log In Failed. Your email or password is invalid"
-        }
+    if not bcrypt.checkpw(req.password.encode('utf-8'), member.password.encode('utf-8')):
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message":"Your email or password is not valid."})
+
     access_token, refresh_token = jwt_util.create_jwt(member.member_id)
-    
     return {
         "message": "Sign In Request Successes",
         "access_token": access_token,
