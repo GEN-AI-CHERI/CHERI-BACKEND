@@ -19,7 +19,7 @@ def get_jwt_secret(member_id: int):
             "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=172800)
         },
         SECRET,
-        algorithm="HS256"
+        algorithm="HS512"
     )
     refresh_token = jwt.encode(
         {
@@ -27,6 +27,6 @@ def get_jwt_secret(member_id: int):
             "exp": datetime.datetime.utcnow() + datetime.timedelta(seconds=400000)
         },
         SECRET,
-        algorithm="HS256"
+        algorithm="HS512"
     )
     return access_token, refresh_token
