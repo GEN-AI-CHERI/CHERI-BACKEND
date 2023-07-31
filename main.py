@@ -56,6 +56,14 @@ async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_d
         "refresh_token": refresh_token
     }
 
+@app.get("/regions")
+async def get_regions(db: Session = Depends(get_db)):
+    region_list = crud.find_region_list(db = db)
+    return {
+        "regions":region_list
+    }
+
+
 @app.post("/chat")
 async def tour_chat():
     return json.loads(

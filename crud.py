@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from model import Member
+from model import Region
 import scheme
 import bcrypt
 
@@ -26,3 +27,5 @@ def find_member_by_email(db: Session, member: scheme.MemberSignInfo):
             return m
     else:
         return None
+def find_region_list(db: Session):
+    return db.query(Region).all()
