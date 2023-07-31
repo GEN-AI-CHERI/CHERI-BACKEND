@@ -48,7 +48,8 @@ async def member_sign_up(req: scheme.MemberSignInfo, db: Session = Depends(get_d
 async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_db)):
     member = crud.find_member_by_email(member=req, db=db)
     if not bcrypt.checkpw(req.password.encode('utf-8'), member.password.encode('utf-8')):
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"message":"Your email or password is not valid."})
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
+                            content={"message": "Your email or password is not valid."})
     access_token, refresh_token = jwt_util.create_jwt(member.member_id)
     return {
         "message": "Sign In Request Successes",
@@ -56,11 +57,12 @@ async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_d
         "refresh_token": refresh_token
     }
 
+
 @app.get("/regions")
 async def get_regions(db: Session = Depends(get_db)):
-    region_list = crud.find_region_list(db = db)
+    region_list = crud.find_region_list(db=db)
     return {
-        "regions":region_list
+        "regions": region_list
     }
 
 

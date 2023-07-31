@@ -17,7 +17,7 @@ class Region(Base):
     __tablename__ = "region"
 
     region_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
-    name = Column(String, unique=True)
+    title = Column(String, unique=True)
     description = Column(String)
     photo = Column(String)
 
