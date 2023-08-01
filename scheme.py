@@ -13,3 +13,12 @@ class ChatRoomInfo(BaseModel):
     begin_date: str
     end_date: str
     region_id: int
+
+
+class ChatReq(BaseModel):
+    prompt: str
+    room_id: int
+
+
+class ChatRoomSaveReq(BaseModel):
+    room_id: int

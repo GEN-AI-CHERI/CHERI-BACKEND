@@ -5,6 +5,7 @@ from model import Member
 from model import Region
 from model import Room
 from model import Chat
+from model import MemberRoom
 import scheme
 import bcrypt
 
@@ -63,3 +64,32 @@ def create_chat(db: Session, contents, isQuestion, room_id):
     db.commit()
     db.refresh(db_chat)
     return db_chat
+
+
+def create_chat_question_answer(req: scheme.ChatReq, chat, db: Session):
+    db_question = Chat(
+        room_id=req.room_id,
+        isQuestion=True,
+        contents=req.prompt
+    )
+    db_answer = Chat(
+        room_id=req.room_id,
+        isQuestion=False,
+        contents=chat
+    )
+    db.add_all([db_question, db_answer])
+    db.commit()
+    db.refresh(db_question)
+    db.refresh(db_answer)
+    return db_question, db_answer
+
+
+def create_chat_member(db: Session, room_id: int, member_id: int):
+    db_member_room = MemberRoom(
+        room_id=room_id,
+        member_id=member_id
+    )
+    db.add_all(db_member_room)
+    db.commit()
+    db.refresh(db_member_room)
+    return db_member_room

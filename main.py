@@ -66,7 +66,7 @@ async def get_regions(db: Session = Depends(get_db)):
     }
 
 
-@app.post("/chatroom")
+@app.post("/chatrooms")
 async def start_chat(req: scheme.ChatRoomInfo, db: Session = Depends(get_db)):
     chatroom = crud.create_chatroom(db=db, req=req)
     print(chatroom.region_id)
@@ -94,14 +94,38 @@ async def start_chat(req: scheme.ChatRoomInfo, db: Session = Depends(get_db)):
     )
     return JSONResponse(status_code=status.HTTP_201_CREATED,
                         content={
-                            "chatroom_id": chatroom.region_id,
+                            "room_id": chatroom.region_id,
                             "chat_id": chat.chat_id,
                             "message": first_question
                         })
 
 
-@app.post("/chat")
-async def tour_chat():
-    return json.loads(
-        gpt_util.get_completion(prompt="Recommand tour plan in Seoul, Korea, for 3 days. Give Response only with json")
-    )
+@app.post("/chats")
+async def tour_chat(req: scheme.ChatReq, db: Session = Depends(get_db)):
+    print(req.prompt)
+    answer = gpt_util.get_completion(prompt=req.prompt)
+    print(answer)
+    db_question, db_answer = crud.create_chat_question_answer(req, answer, db)
+
+    return JSONResponse(status_code=status.HTTP_201_CREATED,
+                        content={
+                            "room_id": req.room_id,
+                            "question": {
+                                "chat_id": db_question.chat_id,
+                                "contents": db_question.contents
+                            },
+                            "answer": {
+                                "chat_id": db_answer.chat_id,
+                                "contents": db_answer.contents
+                            }
+                        })
+
+
+@app.post("/chats/save")
+async def start_chat(req: scheme.ChatRoomSaveReq,
+                     access_token: str | None = Header(default=None),
+                     db: Session = Depends(get_db)
+                     ):
+    member_id = jwt_util.decode_jwt(access_token)['member_id']
+    room_member = crud.create_chat_member(db=db, member_id=member_id, room_id=req.room_id)
+    return {"member_room_data": room_member}
