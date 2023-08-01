@@ -89,7 +89,7 @@ def create_chat_member(db: Session, room_id: int, member_id: int):
         room_id=room_id,
         member_id=member_id
     )
-    db.add_all(db_member_room)
+    db.add(db_member_room)
     db.commit()
     db.refresh(db_member_room)
     return db_member_room

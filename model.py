@@ -70,5 +70,5 @@ class MemberRoom(Base):
     member_room_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
     room_id = Column(BigInteger, ForeignKey("room.room_id"))
     member_id = Column(BigInteger, ForeignKey("member.member_id"))
-    member = relationship("Member", backref="member", foreign_keys=[member_id])
-    room = relationship("Room", backref="room", foreign_keys=[room_id])
+    member = relationship("Member", backref="owner")
+    room = relationship("Room", backref="chat_room")
