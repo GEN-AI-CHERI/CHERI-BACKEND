@@ -58,6 +58,17 @@ async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_d
     }
 
 
+@app.get("/members/me")
+async def member_information(access_token: str | None = Header(default=None), db: Session = Depends(get_db)):
+    member_id = jwt_util.decode_jwt(access_token)['member_id']
+    member = crud.find_member_by_pk(db=db, id=member_id)
+    rooms = crud.find_chatrooms_by_member(db=db, id=member_id)
+    return {
+        "member": member,
+        "room_list": rooms
+    }
+
+
 @app.get("/regions")
 async def get_regions(db: Session = Depends(get_db)):
     region_list = crud.find_region_list(db=db)
@@ -67,7 +78,8 @@ async def get_regions(db: Session = Depends(get_db)):
 
 
 @app.post("/chatrooms")
-async def start_chat(req: scheme.ChatRoomInfo, access_token: str | None = Header(default=None), db: Session = Depends(get_db)):
+async def start_chat(req: scheme.ChatRoomInfo, access_token: str | None = Header(default=None),
+                     db: Session = Depends(get_db)):
     chatroom = crud.create_chatroom(db=db, req=req)
     member_id = jwt_util.decode_jwt(access_token)['member_id']
     room_member = crud.create_chat_member(db=db, member_id=member_id, room_id=chatroom.room_id)
@@ -125,10 +137,18 @@ async def tour_chat(req: scheme.ChatReq, db: Session = Depends(get_db)):
 
 
 @app.post("/chats/save")
-async def start_chat(req: scheme.ChatRoomSaveReq,
-                     access_token: str | None = Header(default=None),
-                     db: Session = Depends(get_db)
-                     ):
+async def request_chat(req: scheme.ChatRoomSaveReq,
+                       access_token: str | None = Header(default=None),
+                       db: Session = Depends(get_db)
+                       ):
     member_id = jwt_util.decode_jwt(access_token)['member_id']
     room_member = crud.create_chat_member(db=db, member_id=member_id, room_id=req.room_id)
     return {"member_room_data": room_member}
+
+
+@app.get("/chatrooms/{room_id}")
+async def get_chatroom_chat(room_id: int, db: Session = Depends(get_db)):
+    chat_list = crud.find_chats_by_room(db=db, room_id=room_id)
+    return {
+        "chats": chat_list
+    }

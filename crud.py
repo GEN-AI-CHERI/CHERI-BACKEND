@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from model import Member
 from model import Region
 from model import Room
@@ -33,8 +33,15 @@ def find_region_list(db: Session):
     return db.query(Region).all()
 
 
+def find_chats_by_room(db: Session, room_id: int):
+    chats = db.query(Chat).filter(Chat.room_id == room_id)
+    chat_list = []
+    for c in chats:
+        chat_list.append(c)
+    return chat_list
+
+
 def create_chatroom(db: Session, req: scheme.ChatRoomInfo):
-    print(req.region_id)
     db_chatroom = Room(
         gender=req.gender,
         age=req.age,
@@ -45,7 +52,6 @@ def create_chatroom(db: Session, req: scheme.ChatRoomInfo):
     db.add(db_chatroom)
     db.commit()
     db.refresh(db_chatroom)
-    print(db_chatroom)
     return db_chatroom
 
 
@@ -70,12 +76,14 @@ def create_chat_question_answer(req: scheme.ChatReq, chat, db: Session):
     db_question = Chat(
         room_id=req.room_id,
         isQuestion=True,
-        contents=req.prompt
+        contents=req.prompt,
+        createdAt=datetime.datetime.now()
     )
     db_answer = Chat(
         room_id=req.room_id,
         isQuestion=False,
-        contents=chat
+        contents=chat,
+        createdAt=datetime.datetime.now()
     )
     db.add_all([db_question, db_answer])
     db.commit()
@@ -93,3 +101,19 @@ def create_chat_member(db: Session, room_id: int, member_id: int):
     db.commit()
     db.refresh(db_member_room)
     return db_member_room
+
+
+def find_member_by_pk(db: Session, id: int):
+    return db.query(Member).get(id)
+
+
+
+def find_chatrooms_by_member(db: Session, id: int):
+    rooms = db.query(Room).options(joinedload(Room.region)).join(MemberRoom.room).filter(MemberRoom.member_id == id).all()
+    room_list = []
+    for r in rooms:
+        if isinstance(r.begin_date, datetime.date):
+            r.begin_date.strftime('%Y-%m-%d')
+            r.end_date.strftime('%Y-%m-%d')
+        room_list.append(r)
+    return room_list
