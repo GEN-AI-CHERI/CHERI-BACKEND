@@ -84,7 +84,8 @@ async def start_chat(req: scheme.ChatRoomInfo, db: Session = Depends(get_db)):
                      "itinerary: ["
                      "{'day':, 'description':, 'places':[],}"
                      "], recommend_next_questions:[]}. recommend_next_questions is your recommend for next question."
-                     " the longer 'description' is the better.")
+                     " the longer 'description' is the better. In 'description', describe about " + region.title + ", "
+                   + "and give summary of tour plans. consider period of travel.")
     )
     chat = crud.create_chat(
         db=db,
