@@ -67,9 +67,10 @@ async def get_regions(db: Session = Depends(get_db)):
 
 
 @app.post("/chatrooms")
-async def start_chat(req: scheme.ChatRoomInfo, db: Session = Depends(get_db)):
+async def start_chat(req: scheme.ChatRoomInfo, access_token: str | None = Header(default=None), db: Session = Depends(get_db)):
     chatroom = crud.create_chatroom(db=db, req=req)
-    print(chatroom.region_id)
+    member_id = jwt_util.decode_jwt(access_token)['member_id']
+    room_member = crud.create_chat_member(db=db, member_id=member_id, room_id=chatroom.room_id)
     region = crud.find_region(db=db, id=chatroom.region_id)
     first_question = json.loads(
         gpt_util.get_completion(
@@ -97,6 +98,7 @@ async def start_chat(req: scheme.ChatRoomInfo, db: Session = Depends(get_db)):
                         content={
                             "room_id": chatroom.region_id,
                             "chat_id": chat.chat_id,
+                            "member_id": member_id,
                             "message": first_question
                         })
 
