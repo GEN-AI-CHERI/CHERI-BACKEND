@@ -107,9 +107,9 @@ def find_member_by_pk(db: Session, id: int):
     return db.query(Member).get(id)
 
 
-
 def find_chatrooms_by_member(db: Session, id: int):
-    rooms = db.query(Room).options(joinedload(Room.region)).join(MemberRoom.room).filter(MemberRoom.member_id == id).all()
+    rooms = db.query(Room).options(joinedload(Room.region)).join(MemberRoom.room).filter(
+        MemberRoom.member_id == id).all()
     room_list = []
     for r in rooms:
         if isinstance(r.begin_date, datetime.date):
