@@ -1,0 +1,41 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - fastapi1
+      - fastapi2
+    networks:
+      - my_network
+
+  fastapi1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - LIBGL_PATH=/usr/lib/x86_64-linux-gnu/libGL.so.1
+
+    ports:
+      - "8001:8000"
+    networks:
+      - my_network
+
+  fastapi2:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - LIBGL_PATH=/usr/lib/x86_64-linux-gnu/libGL.so.1
+    ports:
+      - "8002:8000"
+
+    networks:
+      - my_network
+
+networks:
+  my_network:
