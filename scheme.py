@@ -10,6 +10,7 @@ class MemberSignInfo(BaseModel):
 class ChatRoomInfo(BaseModel):
     gender: str
     age: str
+    theme: list
     begin_date: str
     end_date: str
     region_id: int

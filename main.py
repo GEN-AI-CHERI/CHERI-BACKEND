@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 import json
 
 import scheme
+import model
 import crud
 import database
 import bcrypt
@@ -82,20 +83,24 @@ async def get_regions(db: Session = Depends(get_db)):
     }
 
 
-@app.post("/chatrooms")
+@app.post("/chatrooms/start")
 async def start_chat(req: scheme.ChatRoomInfo, access_token: str | None = Header(default=None),
                      db: Session = Depends(get_db)):
+    themes = crud.find_themes(db=db, theme_list=req.theme)
     chatroom = crud.create_chatroom(db=db, req=req)
+    chatroom_theme = crud.create_chatroom_theme(db=db, room_id=chatroom.room_id, themes=themes)
     member_id = jwt_util.decode_jwt(access_token)['member_id']
     room_member = crud.create_chat_member(db=db, member_id=member_id, room_id=chatroom.room_id)
     region = crud.find_region(db=db, id=chatroom.region_id)
+    for i in themes:
+        print(i.keyword, i.theme_id)
+    theme_str = ', '.join(t.keyword for t in themes)
     first_question = json.loads(
         gpt_util.get_completion(
             prompt="Recommand tour plan in " + region.title + ". I am " + chatroom.age + "years old. "
                    + "I want to travel from " + str(chatroom.begin_date) + "to " + str(chatroom.end_date) + ". Give "
-                                                                                                            "Response "
-                                                                                                            "only "
-                                                                                                            "with json."
+                   + "Response only with json."
+                   + "I like " + theme_str + " ."
                    + "Format is {"
                      "'plan':,"
                      "'description':,"
@@ -111,13 +116,12 @@ async def start_chat(req: scheme.ChatRoomInfo, access_token: str | None = Header
         isQuestion=False,
         room_id=chatroom.room_id
     )
-    return JSONResponse(status_code=status.HTTP_201_CREATED,
-                        content={
-                            "room_id": chatroom.region_id,
-                            "chat_id": chat.chat_id,
-                            "member_id": member_id,
-                            "message": first_question
-                        })
+    return {"room_id": chatroom.region_id,
+            "chat_id": chat.chat_id,
+            "member_id": member_id,
+            "themes": theme_str.split(", "),
+            "message": first_question
+            }
 
 
 @app.post("/chats")

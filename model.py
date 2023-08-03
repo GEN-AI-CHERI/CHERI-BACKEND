@@ -63,7 +63,8 @@ class RoomTheme(Base):
     room_theme_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
     room_id = Column(BigInteger, ForeignKey("room.room_id"))
     theme_id = Column(BigInteger, ForeignKey("theme.theme_id"))
-
+    room = relationship("Room", backref="r_t")
+    Theme = relationship("Theme", backref="t_r")
 
 class MemberRoom(Base):
     __tablename__ = "member_room"

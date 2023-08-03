@@ -6,6 +6,8 @@ from model import Region
 from model import Room
 from model import Chat
 from model import MemberRoom
+from model import Theme
+from model import RoomTheme
 import scheme
 import bcrypt
 
@@ -19,6 +21,7 @@ def create_member(db: Session, member: scheme.MemberSignInfo):
     db.add(db_member)
     db.commit()
     db.refresh(db_member)
+
     return db_member
 
 
@@ -117,3 +120,23 @@ def find_chatrooms_by_member(db: Session, id: int):
             r.end_date.strftime('%Y-%m-%d')
         room_list.append(r)
     return room_list
+
+
+def find_themes(db: Session, theme_list: list):
+    all_theme = db.query(Theme).all()
+    themes = []
+    for t in all_theme:
+        if t.theme_id in theme_list:
+            themes.append(t)
+    return themes
+
+
+def create_chatroom_theme(db: Session, room_id: int, themes: int):
+    db_room_theme = []
+    for t in themes:
+        db_room_theme.append(RoomTheme(theme_id=t.theme_id, room_id=room_id))
+    db.add_all(db_room_theme)
+    db.commit()
+    for d in db_room_theme:
+        db.refresh(d)
+    return None
