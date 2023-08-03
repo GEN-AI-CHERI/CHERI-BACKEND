@@ -92,8 +92,6 @@ async def start_chat(req: scheme.ChatRoomInfo, access_token: str | None = Header
     member_id = jwt_util.decode_jwt(access_token)['member_id']
     room_member = crud.create_chat_member(db=db, member_id=member_id, room_id=chatroom.room_id)
     region = crud.find_region(db=db, id=chatroom.region_id)
-    for i in themes:
-        print(i.keyword, i.theme_id)
     theme_str = ', '.join(t.keyword for t in themes)
     first_question = json.loads(
         gpt_util.get_completion(

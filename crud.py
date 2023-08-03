@@ -111,10 +111,15 @@ def find_member_by_pk(db: Session, id: int):
 
 
 def find_chatrooms_by_member(db: Session, id: int):
-    rooms = db.query(Room).options(joinedload(Room.region)).join(MemberRoom.room).filter(
-        MemberRoom.member_id == id).all()
+    rooms = db.query(Room).options(joinedload(Room.region))\
+        .join(MemberRoom.room).filter(MemberRoom.member_id == id).all()
     room_list = []
     for r in rooms:
+        t = find_chatroom_theme(db=db, room_id=r.room_id)
+        theme_list = []
+        for i in t:
+            theme_list.append(i.theme.keyword)
+        r.themes = theme_list
         if isinstance(r.begin_date, datetime.date):
             r.begin_date.strftime('%Y-%m-%d')
             r.end_date.strftime('%Y-%m-%d')
@@ -140,3 +145,6 @@ def create_chatroom_theme(db: Session, room_id: int, themes: int):
     for d in db_room_theme:
         db.refresh(d)
     return None
+
+def find_chatroom_theme(db: Session, room_id: int):
+    return db.query(RoomTheme).options(joinedload(RoomTheme.room)).filter(RoomTheme.room_id==room_id)
