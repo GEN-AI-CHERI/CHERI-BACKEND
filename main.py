@@ -37,6 +37,11 @@ async def root():
 
 @app.post("/members/signup")
 async def member_sign_up(req: scheme.MemberSignInfo, db: Session = Depends(get_db)):
+    if crud.find_member_by_email(member=req, db=db):
+        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
+                            content={
+                                "message": "Account(Email) already exists."
+                            })
     member = crud.create_member(member=req, db=db)
     return {
         "message": "Sign Up Request Successes.",
