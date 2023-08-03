@@ -16,9 +16,9 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    #allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*", "access-token", "access_token"],
+    allow_origins=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["*", "access-token", "access_token", "Authorization"],
     allow_credentials=False
 )
 
@@ -65,8 +65,8 @@ async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_d
 
 
 @app.get("/members/me")
-async def member_information(access_token: str | None = Header(default=None), db: Session = Depends(get_db)):
-    member_id = jwt_util.decode_jwt(access_token)['member_id']
+async def member_information(Authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
+    member_id = jwt_util.decode_jwt(Authorization)['member_id']
     member = crud.find_member_by_pk(db=db, id=member_id)
     rooms = crud.find_chatrooms_by_member(db=db, id=member_id)
     return {
@@ -84,12 +84,12 @@ async def get_regions(db: Session = Depends(get_db)):
 
 
 @app.post("/chatrooms/start")
-async def start_chat(req: scheme.ChatRoomInfo, access_token: str | None = Header(default=None),
+async def start_chat(req: scheme.ChatRoomInfo, Authorization: str | None = Header(default=None),
                      db: Session = Depends(get_db)):
     themes = crud.find_themes(db=db, theme_list=req.theme)
     chatroom = crud.create_chatroom(db=db, req=req)
     chatroom_theme = crud.create_chatroom_theme(db=db, room_id=chatroom.room_id, themes=themes)
-    member_id = jwt_util.decode_jwt(access_token)['member_id']
+    member_id = jwt_util.decode_jwt(Authorization)['member_id']
     room_member = crud.create_chat_member(db=db, member_id=member_id, room_id=chatroom.room_id)
     region = crud.find_region(db=db, id=chatroom.region_id)
     theme_str = ', '.join(t.keyword for t in themes)
@@ -145,10 +145,10 @@ async def tour_chat(req: scheme.ChatReq, db: Session = Depends(get_db)):
 
 @app.post("/chats/save")
 async def request_chat(req: scheme.ChatRoomSaveReq,
-                       access_token: str | None = Header(default=None),
+                       Authorization: str | None = Header(default=None),
                        db: Session = Depends(get_db)
                        ):
-    member_id = jwt_util.decode_jwt(access_token)['member_id']
+    member_id = jwt_util.decode_jwt(Authorization)['member_id']
     room_member = crud.create_chat_member(db=db, member_id=member_id, room_id=req.room_id)
     return {"member_room_data": room_member}
 
