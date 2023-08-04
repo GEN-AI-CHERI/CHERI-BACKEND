@@ -66,6 +66,7 @@ class RoomTheme(Base):
     room = relationship("Room", backref="r_t")
     theme = relationship("Theme", backref="t_r")
 
+
 class MemberRoom(Base):
     __tablename__ = "member_room"
     member_room_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
@@ -73,3 +74,12 @@ class MemberRoom(Base):
     member_id = Column(BigInteger, ForeignKey("member.member_id"))
     member = relationship("Member", backref="owner")
     room = relationship("Room", backref="chat_room")
+
+
+class Scrap(Base):
+    __tablename__ = "scrap"
+    scrap_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
+    member_id = Column(BigInteger, ForeignKey("member.member_id"))
+    region_id = Column(BigInteger, ForeignKey("region.region_id"))
+    region = relationship("Region", backref="scrap_region")
+    member = relationship("Member", backref="scrap_member")
