@@ -83,3 +83,27 @@ class Scrap(Base):
     region_id = Column(BigInteger, ForeignKey("region.region_id"))
     region = relationship("Region", backref="scrap_region")
     member = relationship("Member", backref="scrap_member")
+
+
+class Guide(Base):
+    __tablename__ = "guide"
+    guide_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
+    region_id = Column(BigInteger, ForeignKey("region.region_id"))
+    name = Column(String)
+    introduction = Column(String)
+    photo = Column(String)
+    tag = Column(String)
+    region = relationship("Region", backref="guide_region")
+
+
+class GuideImage(Base):
+    __tablename__ = "guide_image"
+    image_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
+    activity1 = Column(String)
+    image1 = Column(String)
+    activity2 = Column(String)
+    image2 = Column(String)
+    activity3 = Column(String)
+    image3 = Column(String)
+    guide_id = Column(BigInteger, ForeignKey("guide.guide_id"))
+    guide = relationship("Guide", backref="image_guide")
