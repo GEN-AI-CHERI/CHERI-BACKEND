@@ -81,13 +81,15 @@ async def member_information(Authorization: str | None = Header(default=None), d
     member = crud.find_member_by_pk(db=db, id=member_id)
     rooms = crud.find_chatrooms_by_member(db=db, id=member_id)
     scraps = crud.find_scrap_by_member_pk(db=db, member_id=member_id)
-    for s in scraps:
-        print(s.region.title)
+    recommends = crud.find_recommend_by_member_pk(db=db, member_id=member_id)
     return {
         "member": member,
         "room_list": rooms,
-        "scrap_list": scraps
+        "scrap_list": scraps,
+        "recommends_list": recommends
     }
+
+
 # "scrap_list": scraps
 
 
@@ -97,6 +99,12 @@ async def get_regions(db: Session = Depends(get_db)):
     return {
         "regions": region_list
     }
+
+
+@app.get("/regions/{region_id}")
+async def get_region(region_id: int, db: Session = Depends(get_db)):
+    region = crud.find_region(db=db, id=region_id)
+    return region
 
 
 @app.post("/chatrooms/start")
@@ -158,12 +166,13 @@ async def tour_chat(req: scheme.ChatReq, db: Session = Depends(get_db)):
 
 
 @app.post("/recommend")
-async def tour_chat(req: scheme.RecommendReq, db: Session = Depends(get_db)):
+async def tour_chat(req: scheme.RecommendReq, Authorization: str | None = Header(default=None),
+                    db: Session = Depends(get_db)):
     themes = crud.find_themes(db=db, theme_list=req.theme)
     theme_str = ', '.join(t.keyword for t in themes)
     region_list = crud.find_region_list(db=db)
     region_str = ','.join(str(r.region_id) + " " + r.title + " " for r in region_list)
-    print(region_str)
+    member_id = jwt_util.decode_jwt(Authorization)['member_id']
     recommend = gpt_util.get_completion(
         prompt="I want to travel korea, within below cities \n"
                + region_str + "\n give response only with city's number. Only one city and only one number. don't "
@@ -175,7 +184,9 @@ async def tour_chat(req: scheme.RecommendReq, db: Session = Depends(get_db)):
                + "I like " + theme_str + " ."
     )
     region = crud.find_region(db=db, id=int(recommend))
-    return region
+    print(region.region_id)
+    recommnd = crud.create_recommend(db=db, member_id=member_id, region_id=region.region_id)
+    return recommnd.region
 
 
 @app.post("/chats/save")

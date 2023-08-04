@@ -8,6 +8,7 @@ from model import Chat
 from model import MemberRoom
 from model import Theme
 from model import RoomTheme
+from model import Recommend
 from model import Scrap
 import scheme
 import bcrypt
@@ -161,6 +162,19 @@ def create_scrap(db: Session, member_id: int, region_id: int):
     return db_scrap
 
 
-def find_scrap_by_member_pk(db, member_id):
-    scrap = db.query(Scrap).options(joinedload(Scrap.region)).filter(Scrap.member_id==member_id).all()
+def find_scrap_by_member_pk(db, member_id: int):
+    scrap = db.query(Scrap).options(joinedload(Scrap.region)).filter(Scrap.member_id == member_id).all()
     return scrap
+
+
+def create_recommend(db, member_id: int, region_id: int):
+    db_recommend = Recommend(member_id=member_id, region_id=region_id)
+    db.add(db_recommend)
+    db.commit()
+    db.refresh(db_recommend)
+    return db_recommend
+
+
+def find_recommend_by_member_pk(db, member_id: int):
+    recommend = db.query(Recommend).options(joinedload(Recommend.region)).filter(Recommend.member_id == member_id).all()
+    return recommend
