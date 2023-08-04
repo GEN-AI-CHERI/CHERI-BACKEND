@@ -138,7 +138,7 @@ async def start_chat(req: scheme.ChatRoomInfo, Authorization: str | None = Heade
         isQuestion=False,
         room_id=chatroom.room_id
     )
-    return {"room_id": chatroom.region_id,
+    return {"room_id": chatroom.room_id,
             "chat_id": chat.chat_id,
             "member_id": member_id,
             "themes": theme_str.split(", "),
