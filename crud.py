@@ -112,7 +112,7 @@ def find_member_by_pk(db: Session, id: int):
 
 
 def find_chatrooms_by_member(db: Session, id: int):
-    rooms = db.query(Room).options(joinedload(Room.region))\
+    rooms = db.query(Room).options(joinedload(Room.region)) \
         .join(MemberRoom.room).filter(MemberRoom.member_id == id).all()
     room_list = []
     for r in rooms:
@@ -133,6 +133,7 @@ def find_themes(db: Session, theme_list: list):
     themes = []
     for t in all_theme:
         if t.theme_id in theme_list:
+            print(t.keyword)
             themes.append(t)
     return themes
 
@@ -147,11 +148,12 @@ def create_chatroom_theme(db: Session, room_id: int, themes: int):
         db.refresh(d)
     return None
 
+
 def find_chatroom_theme(db: Session, room_id: int):
-    return db.query(RoomTheme).options(joinedload(RoomTheme.room)).filter(RoomTheme.room_id==room_id)
+    return db.query(RoomTheme).options(joinedload(RoomTheme.room)).filter(RoomTheme.room_id == room_id)
 
 
-def create_scrap(db:Session, member_id:int, region_id:int):
+def create_scrap(db: Session, member_id: int, region_id: int):
     db_scrap = Scrap(member_id=member_id, region_id=region_id)
     db.add(db_scrap)
     db.commit()

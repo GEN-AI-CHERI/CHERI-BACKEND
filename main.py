@@ -63,14 +63,17 @@ async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_d
         "refresh_token": refresh_token
     }
 
+
 @app.post("/scrap")
-async def member_region_scrap(req:scheme.ScrapInfo, Authorization: str | None = Header(default=None),db: Session = Depends(get_db)):
+async def member_region_scrap(req: scheme.ScrapInfo, Authorization: str | None = Header(default=None),
+                              db: Session = Depends(get_db)):
     member_id = jwt_util.decode_jwt(Authorization)['member_id']
     db_scrap = crud.create_scrap(db=db, member_id=member_id, region_id=req.region_id)
     return {
         "message": "Scrap Successes",
         "info": db_scrap
     }
+
 
 @app.get("/members/me")
 async def member_information(Authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
@@ -132,9 +135,7 @@ async def start_chat(req: scheme.ChatRoomInfo, Authorization: str | None = Heade
 
 @app.post("/chats")
 async def tour_chat(req: scheme.ChatReq, db: Session = Depends(get_db)):
-    print(req.prompt)
     answer = gpt_util.get_completion(prompt=req.prompt)
-    print(answer)
     db_question, db_answer = crud.create_chat_question_answer(req, answer, db)
 
     return JSONResponse(status_code=status.HTTP_201_CREATED,
@@ -149,6 +150,27 @@ async def tour_chat(req: scheme.ChatReq, db: Session = Depends(get_db)):
                                 "contents": db_answer.contents
                             }
                         })
+
+
+@app.post("/recommend")
+async def tour_chat(req: scheme.RecommendReq, db: Session = Depends(get_db)):
+    themes = crud.find_themes(db=db, theme_list=req.theme)
+    theme_str = ', '.join(t.keyword for t in themes)
+    region_list = crud.find_region_list(db=db)
+    region_str = ','.join(str(r.region_id) + " " + r.title + " " for r in region_list)
+    print(region_str)
+    recommend = gpt_util.get_completion(
+        prompt="I want to travel korea, within below cities \n"
+               + region_str + "\n give response only with city's number. Only one city and only one number. don't "
+                              "describe"
+                              "about it. give response 'only' number. dont give me text."
+               + "I will travel with " + req.with_who
+               + ". I am " + req.age + "years old. "
+               + "I want to travel from " + str(req.begin_date) + "to " + str(req.end_date)
+               + "I like " + theme_str + " ."
+    )
+    region = crud.find_region(db=db, id=int(recommend))
+    return region
 
 
 @app.post("/chats/save")
@@ -167,4 +189,3 @@ async def get_chatroom_chat(room_id: int, db: Session = Depends(get_db)):
     return {
         "chats": chat_list
     }
-

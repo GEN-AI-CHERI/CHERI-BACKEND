@@ -16,6 +16,14 @@ class ChatRoomInfo(BaseModel):
     region_id: int
 
 
+class RecommendReq(BaseModel):
+    with_who: str
+    age: str
+    theme: list
+    begin_date: str
+    end_date: str
+
+
 class ChatReq(BaseModel):
     prompt: str
     room_id: int
