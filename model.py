@@ -107,3 +107,12 @@ class GuideImage(Base):
     image3 = Column(String)
     guide_id = Column(BigInteger, ForeignKey("guide.guide_id"))
     guide = relationship("Guide", backref="image_guide")
+
+
+class Recommend(Base):
+    __tablename__ = "recommend"
+    recommend_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
+    member_id = Column(BigInteger, ForeignKey("member.member_id"))
+    region_id = Column(BigInteger, ForeignKey("region.region_id"))
+    region = relationship("Region", backref="recommend_region")
+    member = relationship("Member", backref="recommend_member")
