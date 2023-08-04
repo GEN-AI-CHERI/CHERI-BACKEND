@@ -159,3 +159,8 @@ def create_scrap(db: Session, member_id: int, region_id: int):
     db.commit()
     db.refresh(db_scrap)
     return db_scrap
+
+
+def find_scrap_by_member_pk(db, member_id):
+    scrap = db.query(Scrap).options(joinedload(Scrap.region)).filter(Scrap.member_id==member_id).all()
+    return scrap

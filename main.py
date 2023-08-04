@@ -80,10 +80,15 @@ async def member_information(Authorization: str | None = Header(default=None), d
     member_id = jwt_util.decode_jwt(Authorization)['member_id']
     member = crud.find_member_by_pk(db=db, id=member_id)
     rooms = crud.find_chatrooms_by_member(db=db, id=member_id)
+    scraps = crud.find_scrap_by_member_pk(db=db, member_id=member_id)
+    for s in scraps:
+        print(s.region.title)
     return {
         "member": member,
-        "room_list": rooms
+        "room_list": rooms,
+        "scrap_list": scraps
     }
+# "scrap_list": scraps
 
 
 @app.get("/regions")
