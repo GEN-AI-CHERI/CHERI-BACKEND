@@ -63,6 +63,14 @@ async def member_sign_in(req: scheme.MemberSignInfo, db: Session = Depends(get_d
         "refresh_token": refresh_token
     }
 
+@app.post("/scrap")
+async def member_region_scrap(req:scheme.ScrapInfo, Authorization: str | None = Header(default=None),db: Session = Depends(get_db)):
+    member_id = jwt_util.decode_jwt(Authorization)['member_id']
+    db_scrap = crud.create_scrap(db=db, member_id=member_id, region_id=req.region_id)
+    return {
+        "message": "Scrap Successes",
+        "info": db_scrap
+    }
 
 @app.get("/members/me")
 async def member_information(Authorization: str | None = Header(default=None), db: Session = Depends(get_db)):
@@ -159,3 +167,4 @@ async def get_chatroom_chat(room_id: int, db: Session = Depends(get_db)):
     return {
         "chats": chat_list
     }
+

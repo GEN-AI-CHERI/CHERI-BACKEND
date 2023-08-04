@@ -8,6 +8,7 @@ from model import Chat
 from model import MemberRoom
 from model import Theme
 from model import RoomTheme
+from model import Scrap
 import scheme
 import bcrypt
 
@@ -148,3 +149,11 @@ def create_chatroom_theme(db: Session, room_id: int, themes: int):
 
 def find_chatroom_theme(db: Session, room_id: int):
     return db.query(RoomTheme).options(joinedload(RoomTheme.room)).filter(RoomTheme.room_id==room_id)
+
+
+def create_scrap(db:Session, member_id:int, region_id:int):
+    db_scrap = Scrap(member_id=member_id, region_id=region_id)
+    db.add(db_scrap)
+    db.commit()
+    db.refresh(db_scrap)
+    return db_scrap

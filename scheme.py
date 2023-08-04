@@ -23,3 +23,7 @@ class ChatReq(BaseModel):
 
 class ChatRoomSaveReq(BaseModel):
     room_id: int
+
+
+class ScrapInfo(BaseModel):
+    region_id: int
