@@ -90,6 +90,32 @@ async def member_information(Authorization: str | None = Header(default=None), d
     }
 
 
+@app.get("/guides")
+async def get_guides(db: Session = Depends(get_db)):
+    guides = crud.find_guides(db=db)
+    return {
+        "guides": guides
+    }
+
+
+@app.get("/guides/region/{region_id}")
+async def get_guides_by_region(region_id: int, db: Session = Depends(get_db)):
+    guides = crud.find_guides_by_region(db=db, region_id=region_id)
+    return {
+        "guides": guides
+    }
+
+
+@app.get("/guides/{guide_id}")
+async def get_guide_specific(guide_id: int, db: Session = Depends(get_db)):
+    guide = crud.find_guide(db=db, guide_id=guide_id)
+    guide_info = crud.find_guides_info(db=db, guide_id=guide_id)
+    return {
+        "guide": guide,
+        "guide_info": guide_info
+    }
+
+
 @app.get("/regions")
 async def get_regions(db: Session = Depends(get_db)):
     region_list = crud.find_region_list(db=db)

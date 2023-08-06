@@ -2,14 +2,11 @@ import datetime
 
 from sqlalchemy.orm import Session, joinedload
 from model import Member
-from model import Region
-from model import Room
-from model import Chat
-from model import MemberRoom
-from model import Theme
-from model import RoomTheme
+from model import Region, Scrap
+from model import Room, MemberRoom, Chat
+from model import Theme, RoomTheme
 from model import Recommend
-from model import Scrap
+from model import Guide, GuideImage
 import scheme
 import bcrypt
 
@@ -178,3 +175,19 @@ def create_recommend(db, member_id: int, region_id: int):
 def find_recommend_by_member_pk(db, member_id: int):
     recommend = db.query(Recommend).options(joinedload(Recommend.region)).filter(Recommend.member_id == member_id).all()
     return recommend
+
+
+def find_guides(db: Session):
+    return db.query(Guide).options(joinedload(Guide.region)).all()
+
+
+def find_guide(db: Session, guide_id: int):
+    return db.query(Guide).get(guide_id)
+
+
+def find_guides_by_region(db: Session, region_id: int):
+    return db.query(Guide).options(joinedload(Guide.region)).filter(Guide.region_id == region_id).all()
+
+
+def find_guides_info(db: Session, guide_id: int):
+    return db.query(GuideImage).options(joinedload(GuideImage.guide)).filter(GuideImage.guide_id == guide_id).all()
