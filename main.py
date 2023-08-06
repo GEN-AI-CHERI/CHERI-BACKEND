@@ -90,9 +90,6 @@ async def member_information(Authorization: str | None = Header(default=None), d
     }
 
 
-# "scrap_list": scraps
-
-
 @app.get("/regions")
 async def get_regions(db: Session = Depends(get_db)):
     region_list = crud.find_region_list(db=db)

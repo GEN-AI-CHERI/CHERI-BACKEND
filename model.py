@@ -99,12 +99,8 @@ class Guide(Base):
 class GuideImage(Base):
     __tablename__ = "guide_image"
     image_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
-    activity1 = Column(String)
-    image1 = Column(String)
-    activity2 = Column(String)
-    image2 = Column(String)
-    activity3 = Column(String)
-    image3 = Column(String)
+    title = Column(String)
+    image = Column(String)
     guide_id = Column(BigInteger, ForeignKey("guide.guide_id"))
     guide = relationship("Guide", backref="image_guide")
 
