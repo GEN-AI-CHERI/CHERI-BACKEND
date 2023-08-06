@@ -16,7 +16,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*", "http://localhost:3000"],
+    allow_origins=["*", "https://cheri-front.vercel.app/", "http://localhost:3000", "https://cheritalk.site/"],
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*", "access-token", "access_token", "Authorization"],
     allow_credentials=False
@@ -185,8 +185,8 @@ async def tour_chat(req: scheme.RecommendReq, Authorization: str | None = Header
     )
     region = crud.find_region(db=db, id=int(recommend))
     print(region.region_id)
-    recommnd = crud.create_recommend(db=db, member_id=member_id, region_id=region.region_id)
-    return recommnd.region
+    db_recommend = crud.create_recommend(db=db, member_id=member_id, region_id=region.region_id)
+    return db_recommend.region
 
 
 @app.post("/chats/save")
