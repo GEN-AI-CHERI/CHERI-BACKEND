@@ -19,6 +19,7 @@ class Region(Base):
     title = Column(String, unique=True)
     description = Column(String)
     detail = Column(String)
+    summary = Column(String)
     photo = Column(String)
 
 
