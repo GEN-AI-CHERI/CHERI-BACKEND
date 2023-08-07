@@ -225,6 +225,8 @@ async def request_chat(req: scheme.ChatRoomSaveReq,
 @app.get("/chatrooms/{room_id}")
 async def get_chatroom_chat(room_id: int, db: Session = Depends(get_db)):
     chat_list = crud.find_chats_by_room(db=db, room_id=room_id)
+    chat_list[0].contents = json.loads(gpt_util.get_completion(
+        prompt="Reformat below input string to json. Response only formatted json. " + chat_list[0].contents))
     return {
         "chats": chat_list
     }
