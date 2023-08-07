@@ -117,11 +117,22 @@ async def get_guide_specific(guide_id: int, db: Session = Depends(get_db)):
 
 
 @app.get("/regions")
-async def get_regions(db: Session = Depends(get_db)):
+async def get_regions(db: Session = Depends(get_db), Authorization: str | None = Header(default=None)):
     region_list = crud.find_region_list(db=db)
     for r in region_list:
         if r.detail:
             r.detail = r.detail.split("\n\n")
+    if Authorization:
+        member_id = jwt_util.decode_jwt(Authorization)['member_id']
+        scraps = crud.find_scrap_by_member_pk(db=db, member_id=member_id)
+        scrap_check = []
+        for s in scraps:
+            scrap_check.append(s.region_id)
+        for r in region_list:
+            if r.region_id in scrap_check:
+                r.scrap = True
+            else:
+                r.scrap = False
     return {
         "regions": region_list
     }
