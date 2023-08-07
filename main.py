@@ -142,9 +142,16 @@ async def get_regions(db: Session = Depends(get_db), Authorization: str | None =
 
 
 @app.get("/regions/{region_id}")
-async def get_region(region_id: int, db: Session = Depends(get_db)):
+async def get_region(region_id: int, db: Session = Depends(get_db), Authorization: str | None = Header(default=None)):
     region = crud.find_region(db=db, id=region_id)
     region.detail = region.detail.split("\n\n")
+    if Authorization:
+        member_id = jwt_util.decode_jwt(Authorization)['member_id']
+        scraps = crud.find_scrap_by_member_and_region(db=db, member_id=member_id, region_id=region_id)
+        if scraps:
+            region.scrap = True
+        else:
+            region.scrap = False
     return region
 
 

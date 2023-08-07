@@ -197,3 +197,9 @@ def find_guides_info(db: Session, guide_id: int):
 
 def find_recommend_by_pk(db: Session, recommend_id: int):
     return db.query(Recommend).options(joinedload(Recommend.region)).get(recommend_id)
+
+
+def find_scrap_by_member_and_region(db, member_id: int, region_id: int):
+    scrap = db.query(Scrap).options(joinedload(Scrap.region)).filter(Scrap.member_id == member_id, Scrap.region_id == region_id)
+    if len(list(scrap)) > 0:
+        return scrap[0]
