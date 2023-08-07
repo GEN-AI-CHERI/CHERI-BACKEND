@@ -19,6 +19,7 @@ def decode_jwt(access_token: str):
         member_info = jwt.decode(access_token, SECRET, algorithms='HS512')
     except:
         raise HTTPException(status_code=401, detail="Token Expired")
+    return member_info
 
 
 def get_jwt_secret(member_id: int):
