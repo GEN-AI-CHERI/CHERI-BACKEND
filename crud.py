@@ -193,3 +193,7 @@ def find_guides_by_region(db: Session, region_id: int):
 
 def find_guides_info(db: Session, guide_id: int):
     return db.query(GuideImage).options(joinedload(GuideImage.guide)).filter(GuideImage.guide_id == guide_id).all()
+
+
+def find_recommend_by_pk(db: Session, recommend_id: int):
+    return db.query(Recommend).options(joinedload(Recommend.region)).get(recommend_id)

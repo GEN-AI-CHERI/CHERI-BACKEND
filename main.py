@@ -165,7 +165,7 @@ async def start_chat(req: scheme.ChatRoomInfo, Authorization: str | None = Heade
         isQuestion=False,
         room_id=chatroom.room_id
     )
-    guide_list = crud.find_guides_by_region(region.region_id)
+    guide_list = crud.find_guides_by_region(db=db, region_id=region.region_id)
     return {"room_id": chatroom.room_id,
             "chat_id": chat.chat_id,
             "member_id": member_id,
@@ -216,11 +216,19 @@ async def tour_chat(req: scheme.RecommendReq, Authorization: str | None = Header
     db_recommend = crud.create_recommend(db=db, member_id=member_id, region_id=region.region_id)
     db_recommend.region.detail = db_recommend.region.detail.split("\n\n")
     return {
+        "recommend_id": db_recommend.recommend_id,
         "begin_date": req.begin_date,
         "end_date": req.end_date,
         "region": db_recommend.region,
         "themes": theme_str.split(', '),
     }
+
+
+@app.get("/recommend/{recommend_id}")
+async def get_recommend(recommend_id: int, db: Session = Depends(get_db)):
+    recommend = crud.find_recommend_by_pk(db, recommend_id)
+    recommend.region.detail = recommend.region.detail.split("\n\n")
+    return recommend
 
 
 @app.post("/chats/save")
