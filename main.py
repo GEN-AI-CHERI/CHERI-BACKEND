@@ -133,6 +133,9 @@ async def get_regions(db: Session = Depends(get_db), Authorization: str | None =
                 r.scrap = True
             else:
                 r.scrap = False
+    else:
+        for r in region_list:
+            r.scrap = False
     return {
         "regions": region_list
     }
