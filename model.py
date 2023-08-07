@@ -18,6 +18,7 @@ class Region(Base):
     region_id = Column(BigInteger, primary_key=True, autoincrement=True)
     title = Column(String, unique=True)
     description = Column(String)
+    detail = Column(String)
     photo = Column(String)
 
 

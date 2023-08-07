@@ -119,6 +119,9 @@ async def get_guide_specific(guide_id: int, db: Session = Depends(get_db)):
 @app.get("/regions")
 async def get_regions(db: Session = Depends(get_db)):
     region_list = crud.find_region_list(db=db)
+    for r in region_list:
+        if r.detail:
+            r.detail = r.detail.split("\n\n")
     return {
         "regions": region_list
     }
@@ -127,6 +130,7 @@ async def get_regions(db: Session = Depends(get_db)):
 @app.get("/regions/{region_id}")
 async def get_region(region_id: int, db: Session = Depends(get_db)):
     region = crud.find_region(db=db, id=region_id)
+    region.detail = region.detail.split("\n\n")
     return region
 
 
