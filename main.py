@@ -207,9 +207,13 @@ async def tour_chat(req: scheme.RecommendReq, Authorization: str | None = Header
                + "I like " + theme_str + " ."
     )
     region = crud.find_region(db=db, id=int(recommend))
-    print(region.region_id)
     db_recommend = crud.create_recommend(db=db, member_id=member_id, region_id=region.region_id)
-    return db_recommend.region
+    return {
+        "begin_date": req.begin_date,
+        "end_date": req.end_date,
+        "region": db_recommend.region,
+        "themes": theme_str.split(', '),
+    }
 
 
 @app.post("/chats/save")
