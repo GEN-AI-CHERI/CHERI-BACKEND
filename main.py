@@ -183,7 +183,7 @@ async def tour_chat(req: scheme.ChatReq, db: Session = Depends(get_db)):
                             },
                             "answer": {
                                 "chat_id": db_answer.chat_id,
-                                "contents": db_answer.contents
+                                "contents": db_answer.contents.split("\n\n")
                             }
                         })
 
@@ -227,6 +227,8 @@ async def get_chatroom_chat(room_id: int, db: Session = Depends(get_db)):
     chat_list = crud.find_chats_by_room(db=db, room_id=room_id)
     chat_list[0].contents = json.loads(gpt_util.get_completion(
         prompt="Reformat below input string to json. Response only formatted json. " + chat_list[0].contents))
+    for i in range(1, len(chat_list)):
+        chat_list[i].contents = chat_list[i].contents.split('\n\n')
     return {
         "chats": chat_list
     }
