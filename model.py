@@ -15,10 +15,9 @@ class Member(Base):
 class Region(Base):
     __tablename__ = "region"
 
-    region_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
+    region_id = Column(BigInteger, primary_key=True, autoincrement=True)
     title = Column(String, unique=True)
     description = Column(String)
-    detail = Column(String)
     photo = Column(String)
 
 
@@ -40,7 +39,7 @@ class Room(Base):
     begin_date = Column(Date)
     end_date = Column(Date)
     region_id = Column(BigInteger, ForeignKey("region.region_id"))
-    region = relationship("Region", backref="region")
+    region = relationship("Region", backref="room_region")
 
 
 class Chat(Base):
@@ -50,7 +49,7 @@ class Chat(Base):
     isQuestion = Column(Boolean)
     createdAt = Column(DateTime)
     room_id = Column(BigInteger, ForeignKey("room.room_id"))
-    room = relationship("Room", backref="room")
+    room = relationship("Room", backref="r")
 
 
 class Theme(Base):
