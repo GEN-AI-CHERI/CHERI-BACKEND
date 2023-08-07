@@ -32,7 +32,10 @@ def find_member_by_email(db: Session, member: scheme.MemberSignInfo):
 
 
 def find_region_list(db: Session):
-    return db.query(Region).all()
+    db_regions = db.query(Region).all()
+    for r in db_regions:
+        r.detail = r.detail.split("\n\n")
+    return db_regions
 
 
 def find_chats_by_room(db: Session, room_id: int):
@@ -58,7 +61,9 @@ def create_chatroom(db: Session, req: scheme.ChatRoomInfo):
 
 
 def find_region(db: Session, id: int):
-    return db.query(Region).get(id)
+    db_region = db.query(Region).get(id)
+    db_region.detail = db_region.detail.split("\n\n")
+    return db_region
 
 
 def create_chat(db: Session, contents, isQuestion, room_id):
