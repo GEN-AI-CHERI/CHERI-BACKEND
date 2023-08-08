@@ -165,8 +165,8 @@ def find_scrap_by_member_pk(db, member_id: int):
     return scrap
 
 
-def create_recommend(db, member_id: int, region_id: int):
-    db_recommend = Recommend(member_id=member_id, region_id=region_id)
+def create_recommend(db, member_id: int, region_id: int, tag):
+    db_recommend = Recommend(member_id=member_id, region_id=region_id, tag=tag)
     print(db_recommend.region_id)
     db.add(db_recommend)
     db.commit()

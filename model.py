@@ -112,5 +112,7 @@ class Recommend(Base):
     recommend_id = Column(BigInteger, primary_key=True, index=True, autoincrement=True)
     member_id = Column(BigInteger, ForeignKey("member.member_id"))
     region_id = Column(BigInteger, ForeignKey("region.region_id"))
+    tag = Column(String)
     region = relationship("Region", backref="recommend_region")
     member = relationship("Member", backref="recommend_member")
+
