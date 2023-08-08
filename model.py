@@ -94,6 +94,7 @@ class Guide(Base):
     name = Column(String)
     introduction = Column(String)
     photo = Column(String)
+    telephone = Column(String)
     tag = Column(String)
     region = relationship("Region", backref="guide_region")
 
